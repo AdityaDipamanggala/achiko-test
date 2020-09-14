@@ -20,9 +20,9 @@ class UserController{
         })
     }
     static login(req,res){
-        User.findOne({username: req.body.username})
+        User.findOne({email: req.body.email})
         .then(data => {
-            if(data && data.role === req.params.role && bcrypt.compareSync(req.body.password,data.password)){
+            if(data && bcrypt.compareSync(req.body.password,data.password)){
                 let token = jwt.sign({id: data._id, email: data.email,name: data.name, address: data.address},'jwt-key')
                 res.status(200).json({message: 'Login successfully', acess_token: token})
             }
@@ -35,8 +35,10 @@ class UserController{
     }
     static getUser(req, res){
         let {access_token} = req.headers
+        console.log(access_token);
         try{
         let decode = jwt.verify(access_token,'jwt-key')
+        console.log(decode.email);
         User.findOne({email: decode.email})
         .then(data => res.status(200).json({data: data}))
         }
